@@ -1,0 +1,661 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "analyze-profile",
+        "responseMode": "lastNode",
+        "options": {
+          "binaryPropertyName": "image"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "342711ce-666a-4a6e-93ef-f5beee59754d",
+      "name": "Webhook",
+      "webhookId": "094fe7f1-ea60-4534-8238-ebb4a382fa35"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze the attached image.",
+        "options": {
+          "systemMessage": "Identify Face Shape (Oval/Round/Square) and Skin Hex Code. Return ONLY raw JSON: { 'shape': '...', 'hex': '...' }"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "230bb7d5-bd59-4a5f-a747-f5a47fba4981",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "3972270e-9848-4930-9696-468e492d9d2a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.openweathermap.org/data/2.5/weather?q={{ $node[\"Webhook\"].json.body.location }}&appid=AIzaSyAKqR9_rgYU8l3v81Fg79gia4bkwDBlRHY&units=metric",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        496,
+        16
+      ],
+      "id": "454f9e21-f2d7-4794-89d1-e513434f7aad",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User: {{ $node[\"Webhook\"].json.body.gender }}, Style: {{ $node[\"Webhook\"].json.body.style_preference }}.\n\nFace: {{ $node[\"AI Agent\"].json.shape }}, Skin: {{ $node[\"AI Agent\"].json.hex }}.\nWeather: {{ $json.main.temp }}°C.\nSuggest an outfit (Upper/Lower). Return JSON.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        704,
+        16
+      ],
+      "id": "6537efbf-e37f-4905-b201-f525cd93c8c5",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        576,
+        224
+      ],
+      "id": "0a462539-8753-46ab-965e-32ecf4b58d65",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vto-stitching",
+        "responseMode": "lastNode",
+        "options": {
+          "binaryPropertyName": ""
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        448
+      ],
+      "id": "91aac369-3496-4279-ac74-61b38aaffc5f",
+      "name": "Webhook1",
+      "webhookId": "64255392-cea4-4d64-9f59-ce7dffb19f21",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const selfieBase64 = $input.item.json.body.user_selfie;\nconst clothBase64 = $input.item.json.body.selected_cloth;\n\n// Helper to strip data prefix if present\nconst cleanBase64 = (str) => str.includes(',') ? str.split(',')[1] : str;\n\nreturn {\n  binary: {\n    user_image: {\n      data: cleanBase64(selfieBase64),\n      fileName: 'selfie.png',\n      mimeType: 'image/png'\n    },\n    clothing_image: {\n      data: cleanBase64(clothBase64),\n      fileName: 'cloth.png',\n      mimeType: 'image/png'\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        448
+      ],
+      "id": "15bbb5dc-d485-4b25-92c3-2683aa5e6f6e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Perform a Virtual Try-On.\n\nTake the clothing item from 'clothing_image'.\n\nSuperimpose and wrap it onto the person in 'user_image'.\n\nDO NOT change the person's face, skin texture, hair, or the background.\n\nEnsure the clothing fits the body contours and posture naturally.\n\nReturn the resulting image as the output.",
+        "options": {
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        448
+      ],
+      "id": "09a72a94-f5c5-48c8-bf7f-e3426818b191",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        384,
+        640
+      ],
+      "id": "b4b2416d-74d5-4984-970e-0b5d37bd9fd6",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        704,
+        464
+      ],
+      "id": "5431efb8-557c-4c92-b750-f4c7c1abbfb4",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": " wardrobe-match",
+        "responseMode": "lastNode",
+        "options": {
+          "responseContentType": "{   \"owned_item_image\": \"base64_string\",   \"match_type\": \"top\" \n \"bottom\",   \"location\": \"user_city\",   \"style\": \"old_money\" }"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        848
+      ],
+      "id": "3f70ed89-f4b9-44e0-9b59-6ec8c8287055",
+      "name": "Webhook2",
+      "webhookId": "96483ef5-5cc8-473d-849e-926dade55903"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Analyze the attached image of a single garment.\n\nIdentify the Category (Shirt, T-shirt, Trousers, Jeans).\n\nExtract the Color (Hex and Name), Pattern (Solid, Striped, Checkered), and Fabric (Linen, Denim, Cotton).\n\nDetermine the Formalness Level (1-10).\n\nReturn ONLY a JSON object: { 'category': '...', 'color': '...', 'pattern': '...', 'fabric': '...', 'formalness': 0 }",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        848
+      ],
+      "id": "a21e7931-866f-4a0d-97d6-ad73aed17128",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        192,
+        1024
+      ],
+      "id": "e5732cb1-8cdd-46a1-b37e-89606067a405",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "cityName": "jaipur,india"
+      },
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        560,
+        848
+      ],
+      "id": "45b2bfdf-2aa7-42de-8ad1-ed1f3f48bf8b",
+      "name": "OpenWeatherMap"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The user owns this item: {{ $node[\"Vision Analyzer\"].json.color }} {{ $node[\"Vision Analyzer\"].json.fabric }} {{ $node[\"Vision Analyzer\"].json.category }}.\n\nTask: Find 3 complementary {{ $node[\"Webhook\"].json.body.match_type }}s.\nConstraints: > - Must match the user's style preference: {{ $node[\"Webhook\"].json.body.style }}.\n\nMust be appropriate for {{ $node[\"Weather\"].json.main.temp }}°C.\n\nFollow classic color wheel theory (e.g., navy pairs with beige or white).\n\nOutput: Name of item, Why it matches, and a Mock Price.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        848
+      ],
+      "id": "9c6c49ad-7f57-46ed-8e5f-7654a1080a10",
+      "name": "AI Agent4"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        640,
+        1056
+      ],
+      "id": "19a4d511-3e81-4ea3-aa2c-f9baf06e2f76",
+      "name": "Google Gemini Chat Model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1024,
+        848
+      ],
+      "id": "a9baefe5-f8aa-4725-bf68-c345e0a445df",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Data Enrichment",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        1232
+      ],
+      "id": "406b31f6-d391-4f46-af3c-c5ca2e597df7",
+      "name": "Webhook3",
+      "webhookId": "8c877f2d-3d01-4ac0-996f-2ce684afa429"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  const currentPrice = item.json.price;\n  // Generate 7 random historical price points slightly above/below current\n  item.json.price_history = Array.from({length: 7}, () => \n    Math.floor(currentPrice * (0.9 + Math.random() * 0.2))\n  );\n}\nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        1232
+      ],
+      "id": "73f3ac95-f613-4d44-a710-e6f96b111de1",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=The user's size is {{ $node[\"Webhook\"].json.body.top_size }}.\n\nFor the recommended item [{{ $json.item_name }}], simulate a stock check.\nReturn a status: 'Available', 'Low Stock', or 'Out of Stock' based on a weighted random probability (70% Available, 20% Low, 10% Out).\nReturn ONLY JSON: { 'size_status': '...' }",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        1232
+      ],
+      "id": "73cfa932-8472-4abc-bfcc-a00f24d65c13",
+      "name": "AI Agent5"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-09-2025",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        272,
+        1440
+      ],
+      "id": "3c102fc2-cc98-480a-aa00-a997c7a7857c",
+      "name": "Google Gemini Chat Model5",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "640YW0Ng2txeEU4Z",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f726cfe7-baee-4533-814f-3cdb2c2d2387",
+              "leftValue": "={{ $json.price }}",
+              "rightValue": "={{ $node[\"Webhook\"].json.body.budget }}",
+              "operator": {
+                "type": "number",
+                "operation": "lte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        1232
+      ],
+      "id": "4dda9a67-d8a5-45b0-a0e5-6dd2cb8f4591",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"outfit_name\": \"Summer Linen Look\",\n  \"price\": 3500,\n  \"price_history\": [3200, 3600, 3400, 3500],\n  \"size_status\": \"Available\",\n  \"affiliate_link\": \"https://...\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        960,
+        1232
+      ],
+      "id": "d6384504-56e2-4cbb-81a8-7875fae40be6",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent4",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent4": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent5",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent5": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "72e765ef-2046-4a09-ad2b-a8b7257c1d83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "acace90b3234a49057a7566359e0b12948975ffe19a27031a4a21997690d8d31"
+  },
+  "id": "Ht3z0WBT55jJyKsb",
+  "tags": []
+}
