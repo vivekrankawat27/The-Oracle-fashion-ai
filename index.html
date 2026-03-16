@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Oracle | AI Fashion Concierge</title>
+<meta name="description" content="AI-driven luxury fashion concierge — hyper-personalised outfit recommendations.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Ambient orbs -->
+<div class="ambient-orbs">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
+</div>
+
+<!-- Global nav -->
+<nav class="oracle-nav" id="oracle-nav" style="opacity:0;pointer-events:none;">
+  <div class="nav-brand">The <span>Oracle</span></div>
+  <div class="nav-right">
+    <button class="btn btn-ghost nav-wrd-btn" onclick="showScreen('wardrobe')" style="font-size:.8rem;padding:.4rem .9rem;margin-right:.5rem;">&#9695; My Wardrobe</button>
+    <div class="nav-user-chip" id="nav-user-chip">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+      <span class="nav-name" id="nav-name">Seeker</span>
+    </div>
+    <button class="btn btn-ghost" id="btn-logout" style="font-size:.8rem;padding:.4rem .9rem;">Sign Out</button>
+  </div>
+</nav>
+
+<!-- Loading overlay -->
+<div id="loading-overlay">
+  <div class="loading-logo">◈ THE ORACLE</div>
+  <div class="loading-ring"></div>
+  <p class="loading-text" style="font-size:.85rem;">Consulting the Oracle…</p>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1"><div class="loading-dot"></div>Analysing your profile</div>
+    <div class="loading-step" id="ls2"><div class="loading-dot"></div>Processing your selfie</div>
+    <div class="loading-step" id="ls3"><div class="loading-dot"></div>Querying fashion intelligence</div>
+    <div class="loading-step" id="ls4"><div class="loading-dot"></div>Curating your wardrobe</div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ══ SCREEN 1: LANDING ══ -->
+<section class="screen" id="screen-landing">
+  <canvas id="oracle-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:.8;z-index:1;"></canvas>
+  <div class="landing-content">
+    <div class="oracle-eyebrow"><span>◈</span> AI Fashion Intelligence</div>
+    <h1 class="landing-title">The <span class="gradient-text italic">Oracle</span><br>Speaks Your Style</h1>
+    <p class="landing-subtitle">Upload a selfie. Share your story. Receive divine fashion intelligence tailored to your body, your city, your soul.</p>
+    <div class="landing-actions">
+      <button class="btn btn-gold btn-lg" id="btn-start">◈ &nbsp;Consult The Oracle</button>
+      <button class="btn btn-outline" onclick="showScreen('auth')">View Demo</button>
+    </div>
+    <div class="landing-stats">
+      <div class="stat"><span class="stat-num">50k+</span><span class="stat-label">Seekers</span></div>
+      <div class="stat"><span class="stat-num">98%</span><span class="stat-label">Accuracy</span></div>
+      <div class="stat"><span class="stat-num">100+</span><span class="stat-label">Indian Brands</span></div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</section>
+
+<!-- ══ SCREEN 2: AUTH ══ -->
+<section class="screen" id="screen-auth">
+  <div class="auth-card glass" style="margin:auto;">
+    <div class="auth-header">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:#D4AF37;letter-spacing:.1em;margin-bottom:.5rem;">◈ THE ORACLE</div>
+      <h2 style="font-size:2rem;margin-bottom:.4rem;">Enter The Sanctum</h2>
+      <p>Sign in or create your Oracle profile to begin.</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login">Sign In</button>
+      <button class="auth-tab" id="tab-signup">Create Account</button>
+    </div>
+    <!-- Login -->
+    <div id="form-login">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="login-email" type="email" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="login-pass" type="password" placeholder="••••••••"></div>
+      <p class="error-msg" id="login-error"></p>
+      <button class="btn btn-gold full-width mt-2" id="btn-login">Enter The Oracle ◈</button>
+    </div>
+    <!-- Signup -->
+    <div id="form-signup" style="display:none;">
+      <div class="form-group"><label class="form-label">Your Name</label><input class="form-input" id="su-name" type="text" placeholder="e.g. Priya Sharma"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="su-email" type="email" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" id="su-pass" type="password" placeholder="Min 6 characters"></div>
+      <p class="error-msg" id="signup-error"></p>
+      <button class="btn btn-gold full-width mt-2" id="btn-signup">Begin My Journey ◈</button>
+    </div>
+    <div class="auth-divider"><span>secured locally · demo mode</span></div>
+    <p style="font-size:.78rem;text-align:center;color:var(--slate-light);">Data stays on this device. No external auth required.</p>
+  </div>
+</section>
+
+<!-- ══ SCREEN 3: STEP 1 — Height + Location ══ -->
+<section class="screen" id="screen-step1">
+  <div class="profile-wrapper">
+    <div class="profile-progress">
+      <div class="progress-step active" id="pb1"></div>
+      <div class="progress-step" id="pb2"></div>
+      <div class="progress-step" id="pb3"></div>
+      <div class="progress-step" id="pb4"></div>
+    </div>
+    <div class="step-eyebrow">Step 1 of 4 · Profile Intake</div>
+    <h2 class="step-title">Your Physical Canvas</h2>
+    <p class="step-subtitle">The Oracle needs your measurements and location to curate climate-aware, fit-perfect looks.</p>
+    <div class="form-group">
+      <label class="form-label">Your Height</label>
+      <div class="height-unit-tabs">
+        <button class="unit-tab active" data-unit="cm">cm</button>
+        <button class="unit-tab" data-unit="ft">ft/in</button>
+      </div>
+      <input class="form-input" id="height-input" type="number" placeholder="e.g. 165" min="100" max="250" style="max-width:260px;">
+    </div>
+    <div class="form-group" style="margin-top:2rem;">
+      <label class="form-label">Your Location</label>
+      <div class="location-row">
+        <button class="btn btn-outline" id="btn-get-loc">📍 Detect My Location</button>
+        <div class="location-badge" id="loc-badge" style="display:none;"></div>
+      </div>
+      <p style="font-size:.8rem;margin-top:.5rem;color:var(--slate-light);">Used for weather-appropriate styling recommendations.</p>
+    </div>
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="showScreen('auth')">← Back</button>
+      <button class="btn btn-gold" id="btn-next1">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 4: STEP 2 — Gender ══ -->
+<section class="screen" id="screen-step2">
+  <div class="profile-wrapper">
+    <div class="profile-progress">
+      <div class="progress-step done"></div><div class="progress-step active"></div>
+      <div class="progress-step"></div><div class="progress-step"></div>
+    </div>
+    <div class="step-eyebrow">Step 2 of 4 · Style Identity</div>
+    <h2 class="step-title">How Do You Present?</h2>
+    <p class="step-subtitle">The Oracle tailors silhouettes and categories based on how you express yourself.</p>
+    <div class="gender-grid">
+      <div class="gender-card" data-gender="female"><div class="gender-icon">👗</div><div class="gender-label">Feminine</div><div class="gender-sub">Women's &amp; feminine silhouettes</div></div>
+      <div class="gender-card" data-gender="male"><div class="gender-icon">🧥</div><div class="gender-label">Masculine</div><div class="gender-sub">Men's &amp; masculine silhouettes</div></div>
+      <div class="gender-card" data-gender="non-binary"><div class="gender-icon">✦</div><div class="gender-label">Fluid</div><div class="gender-sub">Gender-neutral &amp; unisex</div></div>
+    </div>
+    <div class="step-nav" style="margin-top:2.5rem;">
+      <button class="btn btn-ghost" onclick="showScreen('step1')">← Back</button>
+      <button class="btn btn-gold" id="btn-next2">Continue →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 5: STEP 3 — Body Shape + Style ══ -->
+<section class="screen" id="screen-step3">
+  <div class="profile-wrapper">
+    <div class="profile-progress">
+      <div class="progress-step done"></div><div class="progress-step done"></div>
+      <div class="progress-step active"></div><div class="progress-step"></div>
+    </div>
+    <div class="step-eyebrow">Step 3 of 4 · Body &amp; Aesthetic</div>
+    <h2 class="step-title">Your Silhouette &amp; Soul</h2>
+    <p class="step-subtitle">Select your body shape and style preferences so the Oracle can flatter your form.</p>
+    <label class="form-label" style="margin-bottom:.75rem;">Body Shape</label>
+    <div class="body-grid" id="body-grid"></div>
+    <label class="form-label" style="margin-top:2rem;margin-bottom:.75rem;">Style Preferences <span style="font-weight:400;color:var(--slate-light);text-transform:none;">(select all that apply)</span></label>
+    <div class="style-tags" id="style-tags"></div>
+
+    <!-- Budget Slider -->
+    <div class="budget-section">
+      <div class="budget-label-row">
+        <div>
+          <label class="form-label" style="margin-bottom:.1rem;">Styling Budget</label>
+          <p style="font-size:.78rem;margin:0;color:var(--slate-light);">Set your max spend per look</p>
+        </div>
+        <div class="budget-value" id="budget-display">₹10,000</div>
+      </div>
+      <div class="budget-slider-wrap">
+        <input type="range" class="budget-range" id="budget-range" min="500" max="50000" value="10000" step="500">
+      </div>
+      <div class="budget-chips">
+        <button class="budget-chip" data-val="2000">Budget ₹2k</button>
+        <button class="budget-chip active" data-val="10000">Mid-Range ₹10k</button>
+        <button class="budget-chip" data-val="30000">Luxury ₹30k</button>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="showScreen('step2')">&#8592; Back</button>
+      <button class="btn btn-gold" id="btn-next3">Continue &#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 5b: STEP 4 — Skin Tone + Sizes ══ -->
+<section class="screen" id="screen-step4">
+  <div class="profile-wrapper">
+    <div class="profile-progress">
+      <div class="progress-step done"></div><div class="progress-step done"></div>
+      <div class="progress-step done"></div><div class="progress-step active"></div><div class="progress-step"></div>
+    </div>
+    <div class="step-eyebrow">Step 4 of 5 · Skin &amp; Size</div>
+    <h2 class="step-title">Tone &amp; Fit Profile</h2>
+    <p class="step-subtitle">The Oracle uses your skin tone for colour-theory matching and your sizes for live stock checks.</p>
+
+    <!-- Skin Tone Swatches -->
+    <label class="form-label" style="margin-bottom:.75rem;">✦ Your Skin Tone</label>
+    <div class="skin-swatches" id="skin-swatches-step4" style="margin-bottom:1rem;"></div>
+    <div style="display:flex;gap:.75rem;align-items:center;margin-bottom:2rem;">
+      <div class="skin-hex-dot" id="skin-hex-dot-step4" style="flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <label class="form-label" style="font-size:.75rem;margin-bottom:.3rem;">Or type your hex colour</label>
+        <input class="form-input" id="skin-hex-input" type="text" placeholder="#C68642" maxlength="7" style="width:100%;">
+      </div>
+    </div>
+
+    <!-- Size Selectors -->
+    <label class="form-label" style="margin-bottom:.75rem;">&#128085; Your Clothing Sizes</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem;">
+      <div>
+        <label style="font-size:.78rem;color:var(--slate-light);display:block;margin-bottom:.4rem;">Top / Upper Body</label>
+        <select class="form-input" id="top-size-select" style="width:100%;cursor:pointer;">
+          <option value="">Select size…</option>
+          <option value="XS">XS</option>
+          <option value="S">S</option>
+          <option value="M" selected>M</option>
+          <option value="L">L</option>
+          <option value="XL">XL</option>
+          <option value="XXL">XXL</option>
+          <option value="XXXL">3XL</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:.78rem;color:var(--slate-light);display:block;margin-bottom:.4rem;">Bottom / Waist</label>
+        <select class="form-input" id="bottom-size-select" style="width:100%;cursor:pointer;">
+          <option value="">Select size…</option>
+          <option value="26">26"</option>
+          <option value="28">28"</option>
+          <option value="30" selected>30"</option>
+          <option value="32">32"</option>
+          <option value="34">34"</option>
+          <option value="36">36"</option>
+          <option value="38">38"</option>
+          <option value="40">40"</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="step-nav">
+      <button class="btn btn-ghost" onclick="showScreen('step3')">&#8592; Back</button>
+      <button class="btn btn-gold" id="btn-next4">Continue &#8594;</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 6: SACRED SCAN ══ -->
+<section class="screen" id="screen-scan">
+  <div class="profile-wrapper" style="align-items:center;">
+    <div class="profile-progress">
+      <div class="progress-step done"></div><div class="progress-step done"></div>
+      <div class="progress-step done"></div><div class="progress-step done"></div><div class="progress-step active"></div>
+    </div>
+    <div class="step-eyebrow">Step 5 of 5 · The Sacred Scan</div>
+    <h2 class="step-title" style="text-align:center;">Reveal Yourself</h2>
+    <p class="step-subtitle" style="text-align:center;">Upload a selfie — The Oracle uses computer vision to understand your proportions and recommend perfect fits.</p>
+    <div class="scan-wrapper">
+      <div class="scan-zone" id="scan-zone">
+        <div class="scan-guidelines"><div class="scan-inner"></div></div>
+        <div class="silhouette-overlay">
+          <svg class="silhouette-svg" viewBox="0 0 100 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="18" r="13" fill="#D4AF37"/>
+            <rect x="44" y="30" width="12" height="10" rx="4" fill="#D4AF37"/>
+            <path d="M20 44 Q50 36 80 44 L85 75 Q50 68 15 75 Z" fill="#D4AF37"/>
+            <path d="M22 74 Q50 82 78 74 L74 118 Q50 124 26 118 Z" fill="#D4AF37"/>
+            <rect x="26" y="116" width="18" height="38" rx="6" fill="#D4AF37"/>
+            <rect x="56" y="116" width="18" height="38" rx="6" fill="#D4AF37"/>
+          </svg>
+        </div>
+        <img id="scan-preview" alt="Selfie preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;display:none;border-radius:24px;">
+        <div class="scan-placeholder" id="scan-placeholder" style="z-index:6;text-align:center;padding:2rem;">
+          <div style="font-size:3rem;margin-bottom:1rem;opacity:.5;">📷</div>
+          <p>Click or drag your selfie here</p>
+          <small style="font-size:.78rem;color:var(--slate-light);">Stand ~1 metre from camera · JPG, PNG, WEBP</small>
+        </div>
+      </div>
+      <input type="file" id="scan-input" accept="image/*" style="display:none;">
+      <div class="scan-distance-note">
+        <div class="note-icon">📏</div>
+        <p>Stand <strong>~1 metre</strong> from the camera in good natural light for best results.</p>
+      </div>
+
+      <!-- Skin Tone Picker — always visible, no photo required -->
+      <div class="skin-tone-section" id="skin-tone-section" style="display:block;opacity:1;margin-top:1.5rem;">
+        <div class="skin-tone-label">✦ Select Your Skin Tone <span style="font-weight:400;opacity:.7;font-size:.8em;">(optional — helps refine colour recommendations)</span></div>
+        <div class="skin-swatches" id="skin-swatches"></div>
+        <div class="skin-hex-display">
+          <div class="skin-hex-dot" id="skin-hex-dot"></div>
+          <span id="skin-hex-label">Click a swatch to select your skin tone</span>
+        </div>
+      </div>
+
+      <div class="step-nav" style="justify-content:center;margin-top:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <button class="btn btn-ghost" onclick="showScreen('step4')">← Back</button>
+        <button class="btn btn-gold btn-lg" id="btn-consult">◈ &nbsp;Consult The Oracle</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 7: RESULTS ══ -->
+<section class="screen" id="screen-results" style="flex-direction:column;">
+  <div class="results-header">
+    <div class="oracle-eyebrow" style="display:inline-flex;margin-bottom:1.5rem;">◈ &nbsp;Oracle Speaks</div>
+    <h2 style="font-size:clamp(2.2rem,5vw,3.5rem);">Your Sacred Wardrobe</h2>
+    <p style="max-width:540px;margin:.75rem auto 1.5rem;">The Oracle has studied your essence and curated these divine recommendations.</p>
+    <div id="results-meta" style="display:flex;align-items:center;justify-content:center;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem;"></div>
+  </div>
+  <div class="rec-grid" id="rec-grid"></div>
+  <div class="results-cta">
+    <p style="font-size:.9rem;margin-bottom:.5rem;">Not quite right? Refine your profile or rescan.</p>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+      <button class="btn" style="background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;box-shadow:0 0 20px rgba(168,85,247,.4);font-weight:600;" onclick="openVirtualMirror()">◈ Open Virtual Mirror</button>
+      <button class="btn btn-ghost" onclick="showScreen('scan')">← Back to Scan</button>
+      <button class="btn btn-outline" id="btn-redo">↩ Re-scan</button>
+      <button class="btn btn-ghost" id="btn-restart">⟳ Start Over</button>
+    </div>
+    <p style="font-size:.75rem;margin-top:1.5rem;color:var(--slate-light);">Prices are indicative. Features curated Indian &amp; global brands available in India.</p>
+  </div>
+</section>
+
+
+<!-- ══ SCREEN 8: MY WARDROBE ══ -->
+<section class="screen" id="screen-wardrobe" style="flex-direction:column;align-items:center;padding:2rem 1rem;overflow-y:auto;">
+  <div class="results-header" style="text-align:center;margin-bottom:2rem;width:100%;max-width:620px;">
+    <div class="oracle-eyebrow" style="display:inline-flex;margin-bottom:1rem;">⛉ My Wardrobe</div>
+    <h2 style="font-size:clamp(2rem,4vw,3rem);">Scan Your Garment</h2>
+    <p style="max-width:500px;margin:.5rem auto 1.5rem;color:var(--slate-light);">Upload a top or bottom — the Oracle finds its perfect colour-theory match using live AI.</p>
+
+    <!-- ── Toggle: Find Top / Find Bottom ── -->
+    <div class="wrd-toggle" id="wrd-toggle">
+      <button class="wrd-tog-btn active" data-mode="bottom" onclick="setWardrobeMode(this)">👕 I have a Top → Find Bottoms</button>
+      <button class="wrd-tog-btn" data-mode="top" onclick="setWardrobeMode(this)">👖 I have Bottoms → Find Tops</button>
+    </div>
+  </div>
+
+  <!-- ── Upload Zone ── -->
+  <div class="wardrobe-zone" id="wardrobe-zone" style="position:relative;">
+    <!-- Scan-line animation (existing) -->
+    <div class="wrd-scanline" id="wrd-scanline"></div>
+    <!-- AI scanning overlay (shown while POST is in-flight) -->
+    <div class="wrd-scanning-overlay" id="wrd-scanning-overlay" style="display:none;">
+      <div class="wrd-scan-ring"></div>
+      <div class="wrd-scan-label">
+        <div style="font-weight:600;color:#D4AF37;font-size:.9rem;">Oracle is scanning…</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.25rem;">Identifying colour, fabric & style</div>
+      </div>
+    </div>
+    <img id="wrd-preview" alt="Garment preview" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:3;display:none;border-radius:20px;">
+    <div class="wrd-placeholder" id="wrd-placeholder">
+      <div style="font-size:3rem;margin-bottom:1rem;opacity:.5;">🧥</div>
+      <p>Click or drag garment image here</p>
+      <small style="font-size:.78rem;color:var(--slate-light);">JPG, PNG, WEBP · Flat lay or model</small>
+    </div>
+  </div>
+  <input type="file" id="wrd-input" accept="image/*" style="display:none;">
+
+  <!-- Colour indicator -->
+  <div id="wrd-colour-info" style="display:none;margin-top:1.5rem;text-align:center;">
+    <div style="font-size:.85rem;color:var(--slate-light);margin-bottom:.5rem;">Detected dominant colour</div>
+    <div id="wrd-colour-swatch" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--gold);margin:0 auto .5rem;"></div>
+    <div id="wrd-colour-name" style="font-weight:600;color:var(--gold);"></div>
+  </div>
+
+  <!-- Tooltip wrapper for disabled button -->
+  <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;justify-content:center;align-items:center;">
+    <button class="btn btn-ghost" onclick="showScreen('results')">&#8592; Back</button>
+    <div class="wrd-btn-wrap" id="wrd-btn-wrap" title="Please upload a photo of your garment first.">
+      <button class="btn btn-gold btn-lg" id="btn-wrd-match" disabled onclick="matchGarment()" style="position:relative;">
+        ◆&nbsp;&nbsp;Find My Match
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 9: WARDROBE RESULTS ══ -->
+<section class="screen" id="screen-wardrobe-results" style="flex-direction:column;overflow-y:auto;">
+  <div class="results-header">
+    <div class="oracle-eyebrow" style="display:inline-flex;margin-bottom:1.5rem;">⛉ Wardrobe Match</div>
+    <h2 style="font-size:clamp(2rem,4vw,3rem);">The Oracle's Perfect Matches</h2>
+    <p style="max-width:540px;margin:.75rem auto 1.5rem;" id="wrd-results-subtitle">Matched using complementary colour theory.</p>
+    <div id="wrd-colour-wheel-display" style="display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;"></div>
+  </div>
+
+  <!-- Oracle's Advice highlighted box -->
+  <div id="wrd-oracle-advice" style="display:none;max-width:680px;width:100%;margin:0 auto 2rem;padding:1.1rem 1.4rem;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.03));border:1px solid rgba(212,175,55,.35);border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;">
+      <span style="font-size:1.1rem;">◈</span>
+      <span style="font-weight:700;color:#D4AF37;font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;">Oracle's Advice</span>
+    </div>
+    <p id="wrd-advice-text" style="margin:0;font-size:.88rem;color:rgba(255,255,255,.85);line-height:1.7;font-style:italic;"></p>
+  </div>
+
+  <!-- 3-card match grid -->
+  <div class="wrd-match-grid" id="wrd-match-grid"></div>
+
+  <!-- Legacy grid kept for fallback colour-theory cards -->
+  <div class="rec-grid" id="wrd-rec-grid" style="display:none;"></div>
+
+  <div class="results-cta">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;">
+      <button class="btn btn-ghost" onclick="showScreen('wardrobe')">&#8592; Scan Again</button>
+      <button class="btn btn-outline" onclick="showScreen('results')">&#9670; Full Oracle Results</button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══ SCREEN 10: VIRTUAL MIRROR ══ -->
+<section class="screen" id="screen-virtual-mirror" style="flex-direction:column;align-items:stretch;padding:0;overflow:hidden;">
+
+  <!-- ── VM Header ── -->
+  <div class="vm-header">
+    <button class="btn btn-ghost vm-back-btn" onclick="showScreen('results')">← Sacred Wardrobe</button>
+    <div class="vm-title-wrap">
+      <div class="oracle-eyebrow" style="display:inline-flex;font-size:.7rem;">◈ Module 2</div>
+      <h2 class="vm-title">Virtual Mirror</h2>
+    </div>
+    <div class="vm-selfie-badge" id="vm-selfie-badge">
+      <span class="vm-badge-dot"></span> Sacred Scan Active
+    </div>
+  </div>
+
+  <!-- ── VM Main: Side-by-Side ── -->
+  <div class="vm-main">
+
+    <!-- Left: Sacred Scan (Original Selfie) -->
+    <div class="vm-panel vm-panel-left">
+      <div class="vm-panel-label">
+        <span class="vm-panel-icon">👤</span> Sacred Scan
+      </div>
+      <div class="vm-selfie-frame" id="vm-selfie-frame">
+        <img id="vm-selfie-img" alt="Your Sacred Scan" style="display:none;">
+        <div class="vm-no-selfie" id="vm-no-selfie">
+          <div class="vm-no-selfie-icon">👤</div>
+          <p>Upload a selfie during<br>the scan step to see<br>yourself in each look.</p>
+          <button class="btn btn-ghost" style="margin-top:1rem;font-size:.75rem;" onclick="showScreen('scan')">Upload Selfie →</button>
+        </div>
+        <div class="vm-panel-shine"></div>
+      </div>
+    </div>
+
+    <!-- Divider Arrow -->
+    <div class="vm-divider">
+      <div class="vm-divider-arrow">→</div>
+      <div class="vm-divider-label">AI Stitch</div>
+    </div>
+
+    <!-- Right: Oracle AI Result -->
+    <div class="vm-panel vm-panel-right">
+      <div class="vm-panel-label">
+        <span class="vm-panel-icon">✦</span> Oracle Vision
+      </div>
+      <div class="vm-result-frame" id="vm-result-frame">
+
+        <!-- Placeholder (initial state) -->
+        <div class="vm-placeholder" id="vm-placeholder">
+          <div class="vm-placeholder-icon">◈</div>
+          <p class="vm-placeholder-text">Select a garment from the<br>collection below and click<br><strong>Try It On</strong></p>
+          <div class="vm-placeholder-shimmer"></div>
+        </div>
+
+        <!-- Result image (shown after AI response) -->
+        <img id="vm-result-img" alt="Oracle AI Look" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:20px;">
+
+        <!-- Stitching overlay (loading state) -->
+        <div class="vm-stitching-overlay" id="vm-stitching-overlay" style="display:none;">
+          <div class="vm-stitch-ring"></div>
+          <div class="vm-stitch-text">
+            <div class="vm-stitch-title">The Oracle is<br>stitching your look…</div>
+            <div class="vm-stitch-steps">
+              <div class="vm-stitch-step" id="vms1">◈ Reading your body signature</div>
+              <div class="vm-stitch-step" id="vms2">◈ Draping the garment</div>
+              <div class="vm-stitch-step" id="vms3">◈ Applying divine proportions</div>
+              <div class="vm-stitch-step" id="vms4">◈ Finalising your look</div>
+            </div>
+          </div>
+          <div class="vm-gold-progress">
+            <div class="vm-gold-fill" id="vm-gold-fill"></div>
+          </div>
+        </div>
+
+        <!-- Error state -->
+        <div class="vm-error-state" id="vm-error-state" style="display:none;">
+          <div class="vm-error-icon">◫</div>
+          <p class="vm-error-text">The Oracle's vision is blurred.<br>Please check your connection<br>and try again.</p>
+          <button class="btn btn-gold" id="vm-retry-btn" style="margin-top:1rem;font-size:.78rem;" onclick="vmRetry()">↺ Retry</button>
+        </div>
+
+        <div class="vm-result-shine"></div>
+      </div>
+
+      <!-- Result action strip (shown after result) -->
+      <div class="vm-result-actions" id="vm-result-actions" style="display:none;">
+        <button class="btn btn-gold" onclick="vmDownload()" style="font-size:.75rem;padding:.4rem 1rem;">⬇ Download Look</button>
+        <button class="btn btn-ghost" onclick="vmShareLook()" style="font-size:.75rem;padding:.4rem 1rem;">↗ Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Product Rail ── -->
+  <div class="vm-rail-section">
+    <div class="vm-rail-header">
+      <div class="vm-rail-title">◆ Curated Collection</div>
+      <div class="vm-rail-subtitle" id="vm-rail-subtitle">Select a piece to try on</div>
+    </div>
+    <div class="vm-rail" id="vm-rail">
+      <!-- Populated by virtual-mirror.js -->
+      <div class="vm-rail-loading">
+        <div class="vm-rail-spinner"></div> Loading collection…
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ══ VTO MODAL — CSS Two-Layer Fabric System + n8n Oracle Stitching ══ -->
+<div id="vto-modal">
+  <div class="vto-header">
+    <div class="oracle-eyebrow" style="display:inline-flex;margin-bottom:.75rem;">◈ Virtual Mirror</div>
+    <h3>Fabric Layering Engine</h3>
+    <p id="vto-item-label">Fitting your selected look…</p>
+  </div>
+
+  <!-- Two-layer mirror container -->
+  <div class="virtual-mirror" id="virtual-mirror">
+    <!-- Layer 1: User Selfie (base) -->
+    <img id="vto-selfie" class="base-layer" alt="Your photo" style="display:none;">
+    <!-- Layer 1b: Placeholder shown when no selfie -->
+    <div class="vto-no-selfie" id="vto-no-selfie">
+      <div style="font-size:4rem;opacity:.3;margin-bottom:.75rem;">👤</div>
+      <p style="color:var(--slate-light);font-size:.82rem;margin:0;">Upload a selfie for full<br>body try-on</p>
+    </div>
+    <!-- Layer 2: Garment Overlay -->
+    <img id="vto-garment" class="overlay-layer" alt="Garment" style="display:none;" draggable="false">
+    <!-- Gold frame overlay -->
+    <div class="vto-frame-label">◈ Oracle Virtual Mirror</div>
+    <!-- Scan-line loading animation -->
+    <div class="vto-scanline" id="vto-scanline"></div>
+  </div>
+
+  <!-- Hidden canvas used ONLY for Save Look capture -->
+  <canvas id="vto-canvas" style="display:none;" width="480" height="640"></canvas>
+
+  <!-- Progress bar (shown during loading) -->
+  <div class="vto-progress-wrap" id="vto-progress-wrap">
+    <div class="vto-progress-label">Preparing Try-On Preview… <span id="vto-pct">0%</span></div>
+    <div class="vto-progress-bar"><div class="vto-progress-fill" id="vto-fill"></div></div>
+  </div>
+
+  <!-- Arrow + Scale controls -->
+  <div class="vto-controls" id="vto-controls" style="display:none;">
+    <div class="vto-ctrl-grid">
+      <button class="vto-ctrl-btn" onclick="vtoAdjust(0,-10)" title="Move up">▲</button>
+      <button class="vto-ctrl-btn" onclick="vtoAdjust(-10,0)" title="Move left">◀</button>
+      <button class="vto-ctrl-btn" onclick="vtoAdjust(10,0)"  title="Move right">▶</button>
+      <button class="vto-ctrl-btn" onclick="vtoAdjust(0,10)"  title="Move down">▼</button>
+      <button class="vto-ctrl-btn" onclick="vtoScale(8)"     title="Larger">＋</button>
+      <button class="vto-ctrl-btn" onclick="vtoScale(-8)"    title="Smaller">－</button>
+    </div>
+    <div style="font-size:.7rem;color:var(--slate-light);text-align:center;margin-top:.4rem;">
+      Drag or use arrows to align the garment on your photo
+    </div>
+  </div>
+
+  <!-- ── Oracle Stitching Status ── -->
+  <div id="vto-stitch-status" style="display:none;"></div>
+
+  <!-- ── Oracle AI Result: Side-by-Side Comparison ── -->
+  <div id="vto-result-wrap" style="display:none;">
+    <div class="vto-result-header">
+      <span class="oracle-eyebrow" style="font-size:.7rem;">✦ Oracle AI Result</span>
+      <span id="vto-result-close" onclick="closeVTOResult()" style="cursor:pointer;color:var(--slate-light);font-size:.9rem;">✕</span>
+    </div>
+    <div class="vto-compare-grid">
+      <div class="vto-compare-side">
+        <div class="vto-compare-label">Before</div>
+        <img id="vto-compare-before" alt="Before" />
+      </div>
+      <div class="vto-compare-divider">→</div>
+      <div class="vto-compare-side">
+        <div class="vto-compare-label">After (Oracle AI)</div>
+        <img id="vto-compare-after" alt="Oracle AI Result" />
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:.6rem;">
+      <button class="btn btn-gold" onclick="downloadVTOResult()" style="font-size:.78rem;padding:.4rem 1.2rem;">⬇ Download AI Look</button>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="vto-actions">
+    <button class="btn btn-ghost" onclick="closeVTO()">← Close Mirror</button>
+    <button class="btn btn-gold" id="vto-save-btn" style="display:none;" onclick="saveVTO()">⬇ Save Look</button>
+    <button class="btn btn-gold" id="vto-stitch-btn" style="display:none;background:linear-gradient(135deg,#7c3aed,#a855f7);" onclick="callOracleStitching()">🪡 Oracle Stitch</button>
+  </div>
+</div>
+
+
+
+
+<!-- Three.js UMD (for landing orb) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<!-- TensorFlow.js + MoveNet Pose Detection (VTO engine) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.20.0/dist/tf-backend-webgl.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection@2.1.3/dist/pose-detection.min.js" defer></script>
+
+<!-- Oracle VTO Engine v2 (loaded after TF.js) -->
+<script>
+  // Load VTO engine once TF.js is ready
+  window.addEventListener('load', () => {
+    const s = document.createElement('script');
+    s.src = './vto_engine.js';
+    s.onload = () => console.log('[VTO] Engine loaded');
+    s.onerror = () => console.warn('[VTO] Engine failed to load — check vto_engine.js exists');
+    document.head.appendChild(s);
+  });
+</script>
+
+<script>
+// ═══════════════════════════════════════════════
+//  THE ORACLE — APPLICATION
+// ═══════════════════════════════════════════════
+
+const N8N_URL = 'https://piyushh.app.n8n.cloud/webhook-test/oracle-stylist';
+
+// ── DATASET ──────────────────────────────────────────────
+let ORACLE_PRODUCTS = [];   // loaded once from oracle_products.json
+let datasetLoaded = false;
+
+async function loadDataset() {
+  if (datasetLoaded) return;
+  try {
+    const r = await fetch('./oracle_products.json');
+    if (!r.ok) throw new Error('Dataset not found');
+    const d = await r.json();
+    ORACLE_PRODUCTS = d.products || [];
+    datasetLoaded = true;
+    console.log(`Oracle dataset: ${ORACLE_PRODUCTS.length} products loaded`);
+  } catch(e) {
+    console.warn('Dataset load failed:', e.message);
+    ORACLE_PRODUCTS = [];
+  }
+}
+
+// Card gradient palettes by category
+const CAT_GRADIENTS = {
+  'Ethnic Wear':  'linear-gradient(135deg,#2e1a00,#4e2e00)',
+  'Dresses':      'linear-gradient(135deg,#1a0a2e,#3e1240)',
+  'Workwear':     'linear-gradient(135deg,#0a1a2e,#1a2e4e)',
+  'Shirts':       'linear-gradient(135deg,#0a1a0e,#1a3022)',
+  'Tops':         'linear-gradient(135deg,#2e0a1a,#4e1a2e)',
+  'Bottoms':      'linear-gradient(135deg,#0e0e2e,#1a1a4e)',
+  'Outerwear':    'linear-gradient(135deg,#1a1000,#3a200a)',
+  'Athleisure':   'linear-gradient(135deg,#0a1a0a,#1a3a1a)',
+  'Fashion':      'linear-gradient(135deg,#12121a,#2a1a3a)',
+};
+
+// Style preference tags → product.style map
+const STYLE_MATCH = {
+  'Classic':     ['classic','formal'],
+  'Minimal':     ['minimal','casual'],
+  'Bohemian':    ['ethnic','casual'],
+  'Street Style':['street','casual'],
+  'Formal':      ['formal','classic'],
+  'Ethnic':      ['ethnic'],
+  'Sporty':      ['sporty'],
+  'Romantic':    ['feminine'],
+  'Edgy':        ['street'],
+  'Preppy':      ['classic','casual'],
+};
+
+const BADGES = ['Best Match','AI Pick','Trending','Highly Rated','Style Gem','Oracle Choice'];
+
+function matchProductsFromDataset(count = 8) {
+  if (!ORACLE_PRODUCTS.length) return [];
+
+  const { gender, bodyShape, style: stylePrefs, budget } = state.profile;
+  const budgetCap = budget || 50000;
+
+  // Build preferred styles array from user's style prefs
+  let likedStyles = new Set();
+  (stylePrefs || []).forEach(pref => {
+    (STYLE_MATCH[pref] || []).forEach(s => likedStyles.add(s));
+  });
+
+  // Hard gender pre-filter — only allow matching or neutral items
+  // This is critical: without this, highly-rated wrong-gender items
+  // still pass because (4.5×10 - 30 = 15 > 0)
+  const genderAllowed = (p) => {
+    if (p.gender === 'any') return true;
+    if (!gender) return true;
+    if (gender === 'non-binary') return true;
+    // Map UI gender labels to dataset gender values
+    const gMap = { female: 'female', feminine: 'female', male: 'male', masculine: 'male' };
+    const want = gMap[gender.toLowerCase()] || gender.toLowerCase();
+    return p.gender === want;
+  };
+
+  const scored = ORACLE_PRODUCTS
+    .filter(p => p.price <= budgetCap && genderAllowed(p))
+    .map(p => {
+      let score = p.rating * 10;  // base: 0-50
+
+      // Gender match bonus
+      const gMap = { female: 'female', feminine: 'female', male: 'male', masculine: 'male' };
+      const want = gMap[(gender||'').toLowerCase()] || (gender||'').toLowerCase();
+      if (p.gender === want) score += 40;
+      else if (p.gender === 'any') score += 20;
+
+      // Body shape match
+      if (bodyShape && p.shapes && p.shapes.includes(bodyShape)) score += 35;
+      else if (!p.shapes || p.shapes.length === 0) score += 5;
+
+      // Style match
+      if (likedStyles.has(p.style)) score += 30;
+
+      // Budget fit: closer to budget = more relevant
+      const ratio = p.price / budgetCap;
+      if (ratio >= 0.15 && ratio <= 0.85) score += 20;
+      if (ratio >= 0.3 && ratio <= 0.7) score += 10;
+
+      // Boost highly rated
+      if (p.rating >= 4.3) score += 15;
+      if (p.rating_count >= 1000) score += 10;
+
+      // Slight randomness so results vary between sessions
+      score += Math.random() * 12;
+
+      return { ...p, _score: score };
+    })
+    .sort((a, b) => b._score - a._score);
+
+  const picked = [];
+  const usedCategories = new Set();
+  // First pass: try to ensure category diversity
+  for (const p of scored) {
+    if (!usedCategories.has(p.category)) {
+      picked.push(p);
+      usedCategories.add(p.category);
+      if (picked.length >= count) break;
+    }
+  }
+  // Second pass: fill remaining slots from top-scored
+  for (const p of scored) {
+    if (picked.length >= count) break;
+    if (!picked.find(x => x.id === p.id)) picked.push(p);
+  }
+
+  return picked.slice(0, count).map((p, i) => ({
+    title: p.title.length > 60 ? p.title.slice(0, 58) + '…' : p.title,
+    category: p.category,
+    occasion: p.occasion,
+    confidence: Math.min(99, Math.round(70 + p._score / 8)),
+    price: p.price_fmt,
+    price_raw: p.price,
+    brand: p.brand,
+    badge: BADGES[i % BADGES.length],
+    items: [p.colour + ' ' + p.category],
+    tip: `Rated ${p.rating}★ by ${p.rating_count.toLocaleString('en-IN')} shoppers. ${bodyShape ? 'Curated for your ' + bodyShape + ' silhouette.' : ''}`,
+    gradient: CAT_GRADIENTS[p.category] || CAT_GRADIENTS['Fashion'],
+    emoji: p.emoji,
+    price_history: p.sparkline,
+    affiliate_link: `https://www.myntra.com/${p.id}`,
+    img_url: p.img_url || p.img,
+    local_img: p.img && p.img.startsWith('Images/') ? p.img : null,
+    rating: p.rating,
+    _pid: p.id,
+  }));
+}
+
+// Legacy fallback (only used if dataset & API both fail)
+const MOCK_RECS = [
+  { title:'The Power Ensemble', category:'Workwear', occasion:'Office', confidence:90, price:'₹4,850', brand:'Zara India', badge:'Best Match', items:['Tailored Blazer','Trousers'], tip:'Structured silhouettes command the boardroom.', gradient:'linear-gradient(135deg,#1a0a2e,#2e1a4e)', emoji:'💼' },
+  { title:'Festive Grace', category:'Ethnic Wear', occasion:'Festive', confidence:86, price:'₹6,200', brand:'Fabindia', badge:'Cultural Pick', items:['Chanderi Kurta','Palazzo'], tip:'Heritage textiles meet contemporary cuts.', gradient:'linear-gradient(135deg,#2e1a00,#4e2e00)', emoji:'🌺' },
+];
+
+const BODY_SHAPES = {
+  female:[{id:'hourglass',label:'Hourglass',tag:'Balanced bust & hip',e:'⧖'},{id:'pear',label:'Pear',tag:'Wider hips',e:'🍐'},{id:'apple',label:'Apple',tag:'Fuller midsection',e:'🍎'},{id:'rectangle',label:'Rectangle',tag:'Straight silhouette',e:'▭'},{id:'inverted',label:'Inv. Triangle',tag:'Broader shoulders',e:'▽'}],
+  male:[{id:'rectangle',label:'Rectangle',tag:'Balanced build',e:'▭'},{id:'inverted',label:'Inv. Triangle',tag:'Broad shoulders',e:'▽'},{id:'triangle',label:'Triangle',tag:'Fuller lower body',e:'△'},{id:'oval',label:'Oval',tag:'Fuller midsection',e:'⬭'},{id:'trapezoid',label:'Trapezoid',tag:'Athletic build',e:'⬠'}],
+  'non-binary':[{id:'rectangle',label:'Rectangle',tag:'Linear frame',e:'▭'},{id:'hourglass',label:'Hourglass',tag:'Defined waist',e:'⧖'},{id:'inverted',label:'Inv. Triangle',tag:'Wider shoulders',e:'▽'},{id:'pear',label:'Pear',tag:'Wider hips',e:'🍐'},{id:'oval',label:'Oval',tag:'Rounded frame',e:'⬭'}]
+};
+
+const STYLE_PREFS = ['Classic','Minimal','Bohemian','Street Style','Formal','Ethnic','Sporty','Romantic','Edgy','Preppy'];
+
+let state = {
+  user: null,
+  profile: { height:'', heightUnit:'cm', location:'', gender:'', bodyShape:'', style:[], budget:10000, skinTone:'' },
+  imageBase64: null,
+  currentVtoRec: null
+};
+
+const SKIN_TONES = [
+  '#FDDBB4','#F5C99D','#E8B48A','#D4956A','#C07B4E','#A65E33',
+  '#8B4A20','#6D3414','#3D1A08','#FDEBD0','#E8D5B7','#B8906A'
+];
+
+const RETAILERS = [
+  {name:'Myntra', emoji:'🛍'},
+  {name:'Amazon Fashion', emoji:'📦'},
+  {name:'Ajio', emoji:'✨'},
+  {name:'Nykaa Fashion', emoji:'💄'},
+  {name:'Tata Cliq', emoji:'🏪'}
+];
+
+function genSparklineData() {
+  let v = 2000 + Math.random()*8000, d=[];
+  for(let i=0;i<12;i++){v+=(-500+Math.random()*1000); v=Math.max(500,v); d.push(Math.round(v));}
+  return d;
+}
+
+function drawSparkline(canvas, data, accent='#D4AF37') {
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||240, H=40;
+  canvas.width=W*window.devicePixelRatio; canvas.height=H*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  const min=Math.min(...data), max=Math.max(...data), range=max-min||1;
+  const pts=data.map((v,i)=>({x:i/(data.length-1)*W,y:H-(((v-min)/range)*(H-8)+4)}));
+  // gradient fill
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,accent+'55'); grad.addColorStop(1,accent+'00');
+  ctx.beginPath(); ctx.moveTo(pts[0].x,H);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,H); ctx.closePath();
+  ctx.fillStyle=grad; ctx.fill();
+  // line
+  ctx.beginPath(); pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle=accent; ctx.lineWidth=1.5; ctx.stroke();
+  // last dot
+  const lp=pts[pts.length-1];
+  ctx.beginPath(); ctx.arc(lp.x,lp.y,3,0,Math.PI*2);
+  ctx.fillStyle=accent; ctx.fill();
+}
+
+// ─── SCREEN NAV ───
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+  const t = document.getElementById('screen-'+id);
+  if(t){ t.style.display='flex'; requestAnimationFrame(()=>t.classList.add('active')); }
+  const nav = document.getElementById('oracle-nav');
+  if(id==='landing'){ nav.style.opacity='0'; nav.style.pointerEvents='none'; setTimeout(()=>initOrb('oracle-canvas'),150); }
+  else { nav.style.opacity='1'; nav.style.pointerEvents='all'; updateNav(); }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─── TOAST ───
+function toast(icon, msg) {
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div'); el.className='toast';
+  el.innerHTML=`<span class="toast-icon">${icon}</span><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='all .3s'; setTimeout(()=>el.remove(),300); },3500);
+}
+
+// ─── AUTH ───
+function setupAuth() {
+  const tl=document.getElementById('tab-login'), ts=document.getElementById('tab-signup');
+  const fl=document.getElementById('form-login'), fs=document.getElementById('form-signup');
+  tl.onclick=()=>{ tl.classList.add('active'); ts.classList.remove('active'); fl.style.display='block'; fs.style.display='none'; };
+  ts.onclick=()=>{ ts.classList.add('active'); tl.classList.remove('active'); fs.style.display='block'; fl.style.display='none'; };
+
+  document.getElementById('btn-login').onclick=()=>{
+    const em=document.getElementById('login-email').value.trim();
+    const pw=document.getElementById('login-pass').value.trim();
+    const err=document.getElementById('login-error');
+    err.classList.remove('show');
+    if(!em||!pw){ err.textContent='Please fill all fields.'; err.classList.add('show'); return; }
+    const stored=JSON.parse(localStorage.getItem('oracle_user')||'null');
+    if(!stored||stored.email!==em||stored.pw!==btoa(pw)){ err.textContent='Invalid email or password.'; err.classList.add('show'); return; }
+    state.user={email:em,name:stored.name};
+    localStorage.setItem('oracle_ses',JSON.stringify(state.user));
+    toast('✦',`Welcome back, ${state.user.name||'Seeker'}`);
+    showScreen('step1');
+  };
+
+  document.getElementById('btn-signup').onclick=()=>{
+    const n=document.getElementById('su-name').value.trim();
+    const em=document.getElementById('su-email').value.trim();
+    const pw=document.getElementById('su-pass').value.trim();
+    const err=document.getElementById('signup-error');
+    err.classList.remove('show');
+    if(!n||!em||!pw){ err.textContent='All fields required.'; err.classList.add('show'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){ err.textContent='Enter a valid email.'; err.classList.add('show'); return; }
+    if(pw.length<6){ err.textContent='Password min 6 characters.'; err.classList.add('show'); return; }
+    localStorage.setItem('oracle_user',JSON.stringify({email:em,name:n,pw:btoa(pw)}));
+    state.user={email:em,name:n};
+    localStorage.setItem('oracle_ses',JSON.stringify(state.user));
+    toast('✦',`Oracle welcomes you, ${n}`);
+    showScreen('step1');
+  };
+}
+
+// ─── STEP 1 ───
+function setupStep1() {
+  document.querySelectorAll('.unit-tab').forEach(tab=>{
+    tab.onclick=()=>{ document.querySelectorAll('.unit-tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); state.profile.heightUnit=tab.dataset.unit; document.getElementById('height-input').placeholder=tab.dataset.unit==='cm'?'e.g. 165':'e.g. 5.5'; };
+  });
+  document.getElementById('btn-get-loc').onclick=async()=>{
+    const btn=document.getElementById('btn-get-loc'), badge=document.getElementById('loc-badge');
+    btn.textContent='⟳ Detecting…'; btn.disabled=true;
+    try {
+      const pos=await new Promise((r,j)=>navigator.geolocation.getCurrentPosition(r,j,{timeout:8000}));
+      const res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
+      const d=await res.json();
+      state.profile.location=(d.address?.city||d.address?.town||'Your City')+', India';
+    } catch {
+      try { const r=await fetch('https://ipapi.co/json/'); const d=await r.json(); state.profile.location=(d.city||'India')+', India'; } catch { state.profile.location='India'; }
+    }
+    badge.textContent='📍 '+state.profile.location; badge.style.display='flex';
+    btn.textContent='✓ Location Confirmed'; btn.disabled=false;
+  };
+  document.getElementById('btn-next1').onclick=()=>{
+    const h=document.getElementById('height-input').value.trim();
+    if(!h){ toast('⚠','Please enter your height.'); return; }
+    state.profile.height=h+' '+state.profile.heightUnit;
+    showScreen('step2');
+  };
+}
+
+// ─── STEP 2 ───
+function setupStep2() {
+  document.querySelectorAll('.gender-card').forEach(c=>{
+    c.onclick=()=>{ document.querySelectorAll('.gender-card').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); state.profile.gender=c.dataset.gender; };
+  });
+  document.getElementById('btn-next2').onclick=()=>{
+    if(!state.profile.gender){ toast('⚠','Please select a gender option.'); return; }
+    renderBodyShapes(); renderStyleTags(); showScreen('step3');
+  };
+}
+
+// ─── STEP 3 ───
+function renderBodyShapes() {
+  const g=state.profile.gender||'female';
+  const shapes=BODY_SHAPES[g]||BODY_SHAPES.female;
+  const grid=document.getElementById('body-grid');
+  grid.innerHTML=shapes.map(s=>`<div class="body-card" data-shape="${s.id}"><div style="font-size:2.5rem;line-height:1">${s.e}</div><div class="body-label">${s.label}</div><div class="body-tag">${s.tag}</div></div>`).join('');
+  grid.querySelectorAll('.body-card').forEach(c=>{ c.onclick=()=>{ grid.querySelectorAll('.body-card').forEach(x=>x.classList.remove('selected')); c.classList.add('selected'); state.profile.bodyShape=c.dataset.shape; }; });
+}
+
+function renderStyleTags() {
+  const c=document.getElementById('style-tags');
+  c.innerHTML=STYLE_PREFS.map(s=>`<button class="style-tag" data-s="${s}">${s}</button>`).join('');
+  c.querySelectorAll('.style-tag').forEach(t=>{ t.onclick=()=>{ t.classList.toggle('active'); const s=t.dataset.s; state.profile.style.includes(s)?state.profile.style=state.profile.style.filter(x=>x!==s):state.profile.style.push(s); }; });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('btn-next3').onclick=()=>{
+    if(!state.profile.bodyShape){ toast('⚠','Please select your body shape.'); return; }
+    showScreen('scan');
+  };
+});
+
+// ─── SCAN ───
+function setupScan() {
+  const zone=document.getElementById('scan-zone');
+  const inp=document.getElementById('scan-input');
+  const prev=document.getElementById('scan-preview');
+  const ph=document.getElementById('scan-placeholder');
+
+  zone.onclick=()=>inp.click();
+  inp.onchange=(e)=>{
+    const f=e.target.files[0]; if(!f) return;
+    const rd=new FileReader();
+    rd.onload=(ev)=>{ prev.src=ev.target.result; prev.style.display='block'; ph.style.display='none'; zone.classList.add('has-image'); state.imageBase64=ev.target.result.split(',')[1]; toast('✓','Selfie captured. Ready to consult.'); };
+    rd.readAsDataURL(f);
+  };
+
+  zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.style.borderColor='var(--gold)'; });
+  zone.addEventListener('dragleave',()=>zone.style.borderColor='');
+  zone.addEventListener('drop',e=>{ e.preventDefault(); zone.style.borderColor=''; if(e.dataTransfer.files[0]){ const dt=new DataTransfer(); dt.items.add(e.dataTransfer.files[0]); inp.files=dt.files; inp.dispatchEvent(new Event('change')); } });
+
+  document.getElementById('btn-consult').onclick=async()=>{
+    if(!state.imageBase64){
+      toast('📷','No selfie — consulting with your text profile only…');
+      await new Promise(r=>setTimeout(r,700));
+    }
+    await consultOracle();
+  };
+}
+
+// ─── SKIN TONE SETUP ───
+function setupSkinTone() {
+  const c=document.getElementById('skin-swatches');
+  c.innerHTML=SKIN_TONES.map((hex,i)=>`<div class="swatch" data-hex="${hex}" style="background:${hex}" title="Skin tone ${i+1}"></div>`).join('');
+  c.querySelectorAll('.swatch').forEach(s=>{
+    s.onclick=()=>{
+      c.querySelectorAll('.swatch').forEach(x=>x.classList.remove('selected'));
+      s.classList.add('selected');
+      state.profile.skinTone=s.dataset.hex;
+      document.getElementById('skin-hex-dot').style.background=s.dataset.hex;
+      document.getElementById('skin-hex-label').textContent=s.dataset.hex+' — Selected';
+    };
+  });
+}
+
+// ─── BUDGET SETUP ───
+function setupBudget() {
+  const range=document.getElementById('budget-range');
+  const disp=document.getElementById('budget-display');
+  const updateSlider=v=>{
+    state.profile.budget=parseInt(v);
+    disp.textContent='₹'+parseInt(v).toLocaleString('en-IN');
+    const pct=((v-500)/(50000-500)*100).toFixed(1);
+    range.style.setProperty('--pct',pct+'%');
+  };
+  range.oninput=()=>{ updateSlider(range.value); document.querySelectorAll('.budget-chip').forEach(c=>c.classList.remove('active')); };
+  document.querySelectorAll('.budget-chip').forEach(c=>{
+    c.onclick=()=>{ document.querySelectorAll('.budget-chip').forEach(x=>x.classList.remove('active')); c.classList.add('active'); range.value=c.dataset.val; updateSlider(c.dataset.val); };
+  });
+  updateSlider(10000);
+}
+
+// ─── API + LOADING ───
+async function consultOracle() {
+  document.getElementById('loading-overlay').classList.add('show');
+  await animateSteps();
+  const payload={
+    request_type: 'full_outfit',
+    user_data:{ height:state.profile.height, gender:state.profile.gender, location:state.profile.location, style:state.profile.style.join(', '), body_shape:state.profile.bodyShape, skin_tone:state.profile.skinTone },
+    user_sizes:{ upper:state.profile.topSize||'M', lower:state.profile.bottomSize||'30' },
+    image_data:state.imageBase64?{base64_image:state.imageBase64,mime_type:'image/jpeg'}:null,
+    user_budget: state.profile.budget||10000,
+    vto_request: true,
+    timestamp:new Date().toISOString(),source:'the-oracle-app'
+  };
+  // Try local dataset first (instant), then live API, then absolute fallback
+  await loadDataset();
+  const datasetRecs = matchProductsFromDataset(8);
+
+  let recs = datasetRecs.length ? datasetRecs : MOCK_RECS;
+  let src = datasetRecs.length ? 'dataset' : 'mock';
+
+  try {
+    const ctrl=new AbortController(); setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(N8N_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctrl.signal});
+    if(r.ok){ const d=await r.json(); if(d?.recommendations?.length){ recs=d.recommendations; src='live'; } }
+  } catch(e){ console.warn('Oracle API:',e.message||e); }
+  document.getElementById('loading-overlay').classList.remove('show');
+  renderResults(recs, src);
+  showScreen('results');
+  setTimeout(()=>{ setupTilt(); setupSparklines(); },200);
+  const srcMsg = src==='live' ? 'Live AI recommendations!' : src==='dataset' ? `${recs.length} matches from your style catalogue` : 'Curated demo shown';
+  toast(src==='live'?'✦':'◈', srcMsg);
+}
+
+function animateSteps(){
+  return new Promise(res=>{
+    const steps=['ls1','ls2','ls3','ls4']; let i=0;
+    const go=()=>{ if(i>0){const p=document.getElementById(steps[i-1]); p.classList.remove('active'); p.classList.add('done');} if(i<steps.length){document.getElementById(steps[i]).classList.add('active');i++;setTimeout(go,850);}else setTimeout(res,300); };
+    go();
+  });
+}
+
+// ─── RESULTS ───
+function renderResults(recs, src) {
+  const meta=document.getElementById('results-meta');
+  const budgetStr=state.profile.budget?'₹'+state.profile.budget.toLocaleString('en-IN'):'';
+  meta.innerHTML=[state.profile.gender,state.profile.location,state.profile.bodyShape,budgetStr,(src==='live'?'🟢 Live AI':'◇ Demo')].map(v=>v?`<div class="meta-pill">${v}</div>`:'').join('');
+
+  document.getElementById('rec-grid').innerHTML=recs.map((r,i)=>{
+    // Use Myntra as retailer if this is a dataset product, else cycle through retailers
+    const retailer = r._pid ? {name:'Myntra', emoji:'🛍'} : RETAILERS[i%RETAILERS.length];
+    const affLink = r.affiliate_link || (r._pid ? `https://www.myntra.com/${r._pid}` : 'https://www.myntra.com/');
+    const sparks = r.price_history || genSparklineData();
+    const sparkMin = '₹' + Math.min(...sparks).toLocaleString('en-IN');
+    const sparkMax = '₹' + Math.max(...sparks).toLocaleString('en-IN');
+    // Product image: use Myntra CDN URL if available
+    const hasImg = r.img_url && r.img_url.startsWith('http');
+    const imgHtml = hasImg
+      ? `<img src="${r.img_url}" alt="${r.title}" style="width:100%;height:100%;object-fit:cover;opacity:.85;" onerror="this.style.display='none';this.parentElement.querySelector('.rec-emoji').style.display='flex';">`
+      : '';
+    return `
+    <div class="rec-card" data-i="${i}" data-recs='${JSON.stringify({...r,sparkData:sparks}).replace(/'/g,"&apos;")}'>
+      <div class="rec-card-glow"></div>
+      <div class="rec-card-header" style="background:${r.gradient||'linear-gradient(135deg,#1a0a2e,#2e1a4e)'}; overflow:hidden; position:relative;">
+        ${imgHtml}
+        ${r.badge?`<div class="rec-card-badge" style="position:absolute;top:.75rem;left:.75rem;z-index:2;">${r.badge}</div>`:''}
+        <div class="rec-confidence" style="position:absolute;top:.75rem;right:.75rem;z-index:2;">${r.confidence||90}% match</div>
+        <div class="rec-emoji" style="${hasImg?'display:none;':''} position:absolute;bottom:.75rem;right:.75rem;z-index:2;">${r.emoji||'👗'}</div>
+      </div>
+      <div class="rec-body">
+        <!-- Retailer row -->
+        <div class="retailer-row">
+          <div class="retailer-badge">${retailer.emoji} ${retailer.name}</div>
+          <div class="retailer-price-bold">${r.price||'₹2,999'}</div>
+        </div>
+        <div class="rec-category">${r.category||'Style'}</div>
+        <div class="rec-title">${r.title}</div>
+        <div class="rec-items">${(r.items||[]).map(x=>`<div class="rec-item">${x}</div>`).join('')}</div>
+        ${r.tip?`<div class="rec-tip">"${r.tip}"</div>`:''}
+        <!-- Price sparkline -->
+        <div class="sparkline-wrap">
+          <div class="sparkline-label">90-day price trend &nbsp;·&nbsp; ${sparkMin} – ${sparkMax}</div>
+          <canvas class="sparkline-canvas" data-spark='${JSON.stringify(sparks)}'></canvas>
+        </div>
+        <div class="rec-footer" style="margin-bottom:.8rem;">
+          <div><div class="rec-brand">${r.brand||''}</div></div>
+          ${r.occasion?`<div class="rec-occasion">${r.occasion}</div>`:''}
+        </div>
+        <!-- Size badge + Affiliate + Try-On -->
+        ${getSizeBadge(r)}
+        <button class="btn-affiliate" onclick="window.open('${affLink}','_blank')">&#128722; Buy Now</button>
+        <button class="btn-try-on" onclick="openVTO(this)" data-emoji="${r.emoji||'\u{1F457}'}" data-title="${r.title}" data-img="${r.img_url||''}">&#9672; Virtual Try-On</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setupSparklines() {
+  document.querySelectorAll('.sparkline-canvas').forEach(c=>{
+    try { drawSparkline(c, JSON.parse(c.dataset.spark)); } catch(e){}
+  });
+}
+
+// ─── 3D TILT CARDS ───
+function setupTilt(){
+  document.querySelectorAll('.rec-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{ const r=card.getBoundingClientRect(),dx=(e.clientX-r.left-r.width/2)/(r.width/2),dy=(e.clientY-r.top-r.height/2)/(r.height/2); card.style.transform=`perspective(900px) rotateX(${dy*-12}deg) rotateY(${dx*14}deg) scale3d(1.03,1.03,1.03)`; });
+    card.addEventListener('mouseleave',()=>card.style.transform='perspective(900px) rotateX(0) rotateY(0) scale3d(1,1,1)');
+  });
+}
+
+// ─── VIRTUAL TRY-ON ───
+function openVTO(btn) {
+  const emoji=btn.dataset.emoji||'👗', title=btn.dataset.title||'Your Look';
+  document.getElementById('vto-item-label').textContent='Fitting: '+title;
+  const modal=document.getElementById('vto-modal'); modal.classList.add('open');
+  const canvas=document.getElementById('vto-canvas');
+  const ctx=canvas.getContext('2d');
+  const scan=document.getElementById('vto-scanline');
+  const prog=document.getElementById('vto-progress-wrap');
+  const fill=document.getElementById('vto-fill');
+  const pctEl=document.getElementById('vto-pct');
+  const saveBtn=document.getElementById('vto-save-btn');
+
+  // Reset
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  scan.classList.add('scanning');
+  prog.classList.add('visible');
+  fill.style.width='0%'; pctEl.textContent='0%';
+  saveBtn.style.display='none';
+
+  let pct=0;
+  const tick=setInterval(()=>{ pct+=Math.random()*8+3; if(pct>=100){pct=100;clearInterval(tick);scan.classList.remove('scanning'); saveBtn.style.display='flex'; renderVTO(ctx,canvas,emoji); } fill.style.width=pct+'%'; pctEl.textContent=Math.min(100,Math.round(pct))+'%'; },160);
+}
+
+function renderVTO(ctx, canvas, emoji) {
+  const W=canvas.width, H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  // Background gradient
+  const bg=ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#0A0E1A'); bg.addColorStop(1,'#1a0a2e');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  if(state.imageBase64) {
+    const img=new Image();
+    img.onload=()=>{
+      // Draw selfie centered
+      const aspect=img.naturalWidth/img.naturalHeight;
+      const dh=H, dw=dh*aspect;
+      const dx=(W-dw)/2;
+      ctx.drawImage(img,dx,0,dw,dh);
+      // Overlay emoji garment
+      ctx.font=`${W*0.55}px serif`;
+      ctx.globalAlpha=0.82;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(emoji, W/2, H*0.56);
+      ctx.globalAlpha=1;
+      // Gold frame
+      ctx.strokeStyle='rgba(212,175,55,0.5)'; ctx.lineWidth=3;
+      ctx.strokeRect(4,4,W-8,H-8);
+      // Label
+      ctx.fillStyle='rgba(212,175,55,0.9)'; ctx.font='bold 14px Inter,sans-serif';
+      ctx.fillText('✦ Oracle Virtual Mirror', W/2, 22);
+    };
+    img.src='data:image/jpeg;base64,'+state.imageBase64;
+  } else {
+    // No selfie — draw silhouette + garment
+    ctx.fillStyle='rgba(212,175,55,0.06)'; ctx.fillRect(0,0,W,H);
+    ctx.font=`${W*0.55}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.globalAlpha=0.9; ctx.fillText(emoji,W/2,H/2); ctx.globalAlpha=1;
+    ctx.fillStyle='rgba(212,175,55,0.5)'; ctx.font='13px Inter,sans-serif';
+    ctx.fillText('Upload a selfie for full try-on',W/2,H-30);
+  }
+  toast('◈','Virtual Try-On ready!');
+}
+
+function closeVTO() { document.getElementById('vto-modal').classList.remove('open'); }
+
+function saveVTO() {
+  const canvas=document.getElementById('vto-canvas');
+  const a=document.createElement('a'); a.href=canvas.toDataURL('image/png');
+  a.download='oracle-look.png'; a.click();
+  toast('✓','Look saved as oracle-look.png');
+}
+
+// ─── UPDATE NAV ───
+function updateNav(){
+  if(!state.user) return;
+  const n=state.user.name||state.user.email||'Seeker';
+  document.getElementById('nav-name').textContent=n.split(' ')[0];
+  document.getElementById('nav-avatar').textContent=n[0].toUpperCase();
+}
+
+// ─── THREE.JS ORB ───
+function initOrb(canvasId){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas||!window.THREE) return;
+  const W=canvas.clientWidth||window.innerWidth, H=canvas.clientHeight||window.innerHeight;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(60,W/H,0.1,100); camera.position.z=4.5;
+  const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+  renderer.setSize(W,H); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+  // Orb
+  const geo=new THREE.IcosahedronGeometry(1.5,4);
+  const mat=new THREE.MeshPhysicalMaterial({color:0x1a1200,emissive:new THREE.Color(0xA08020),emissiveIntensity:.6,metalness:.9,roughness:.15,transparent:true,opacity:.92});
+  const orb=new THREE.Mesh(geo,mat); scene.add(orb);
+  const wmat=new THREE.MeshBasicMaterial({color:0xD4AF37,wireframe:true,transparent:true,opacity:.18});
+  const wire=new THREE.Mesh(geo,wmat); wire.scale.setScalar(1.02); scene.add(wire);
+  // Inner glow
+  const ig=new THREE.Mesh(new THREE.SphereGeometry(1.2,32,32),new THREE.MeshBasicMaterial({color:0x5020A0,transparent:true,opacity:.12})); scene.add(ig);
+  // Particles
+  const pcount=600,pp=new Float32Array(pcount*3);
+  for(let i=0;i<pcount;i++){const φ=Math.acos(2*Math.random()-1),θ=Math.random()*Math.PI*2,r=2+Math.random()*3;pp[i*3]=r*Math.sin(φ)*Math.cos(θ);pp[i*3+1]=r*Math.sin(φ)*Math.sin(θ);pp[i*3+2]=r*Math.cos(φ);}
+  const pg=new THREE.BufferGeometry(); pg.setAttribute('position',new THREE.BufferAttribute(pp,3));
+  const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xD4AF37,size:.05,transparent:true,opacity:.6})); scene.add(pts);
+  // Lights
+  scene.add(new THREE.AmbientLight(0x1a1025,1.5));
+  const gl=new THREE.PointLight(0xD4AF37,5,20); gl.position.set(3,3,3); scene.add(gl);
+  const pl=new THREE.PointLight(0x7B2FBE,3,15); pl.position.set(-3,-2,2); scene.add(pl);
+
+  const mouse={x:0,y:0};
+  window.onmousemove=e=>{ mouse.x=(e.clientX/innerWidth)*2-1; mouse.y=-(e.clientY/innerHeight)*2+1; };
+  window.addEventListener('resize',()=>{ camera.aspect=canvas.clientWidth/canvas.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(canvas.clientWidth,canvas.clientHeight); });
+
+  const clk=new THREE.Clock();
+  (function loop(){
+    requestAnimationFrame(loop);
+    const t=clk.getElapsedTime();
+    const pulse=1+.06*Math.sin(t*1.8); orb.scale.setScalar(pulse); wire.scale.setScalar(pulse*1.015);
+    orb.rotation.y=t*.18; orb.rotation.x=Math.sin(t*.3)*.15+mouse.y*.3;
+    orb.rotation.y+=mouse.x*.3;
+    wire.rotation.y=t*.12; wire.rotation.z=t*.08;
+    pts.rotation.y=t*.04;
+    mat.emissiveIntensity=.45+.25*Math.sin(t*2.2);
+    renderer.render(scene,camera);
+  })();
+}
+
+// ─── STEP 4: SKIN TONE + SIZE ───
+function setupStep4() {
+  // Populate swatches in step4
+  const sw4 = document.getElementById('skin-swatches-step4');
+  if (sw4) {
+    sw4.innerHTML = SKIN_TONES.map((hex,i) =>
+      `<div class="swatch" data-hex="${hex}" style="background:${hex}" title="Tone ${i+1}"></div>`
+    ).join('');
+    sw4.querySelectorAll('.swatch').forEach(s => {
+      s.onclick = () => {
+        sw4.querySelectorAll('.swatch').forEach(x => x.classList.remove('selected'));
+        s.classList.add('selected');
+        state.profile.skinTone = s.dataset.hex;
+        const dot = document.getElementById('skin-hex-dot-step4');
+        if (dot) { dot.style.background = s.dataset.hex; }
+        const inp = document.getElementById('skin-hex-input');
+        if (inp) inp.value = s.dataset.hex;
+      };
+    });
+  }
+  // Manual hex input
+  const hexInp = document.getElementById('skin-hex-input');
+  if (hexInp) {
+    hexInp.oninput = () => {
+      const v = hexInp.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+        state.profile.skinTone = v;
+        const dot = document.getElementById('skin-hex-dot-step4');
+        if (dot) dot.style.background = v;
+        // Deselect swatches
+        if (sw4) sw4.querySelectorAll('.swatch').forEach(x => x.classList.remove('selected'));
+      }
+    };
+  }
+  // Step 3 continue → step4
+  const btn3 = document.getElementById('btn-next3');
+  if (btn3) btn3.onclick = () => {
+    if (!state.profile.bodyShape) { toast('⚠','Please select your body shape.'); return; }
+    showScreen('step4');
+  };
+  // Step 4 continue → scan
+  const btn4 = document.getElementById('btn-next4');
+  if (btn4) btn4.onclick = () => {
+    // Save sizes
+    const ts = document.getElementById('top-size-select');
+    const bs = document.getElementById('bottom-size-select');
+    state.profile.topSize    = ts ? ts.value : 'M';
+    state.profile.bottomSize = bs ? bs.value : '30';
+    showScreen('scan');
+  };
+  // Size dropdowns save on change
+  ['top-size-select','bottom-size-select'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.onchange = () => {
+      state.profile.topSize    = document.getElementById('top-size-select')?.value || 'M';
+      state.profile.bottomSize = document.getElementById('bottom-size-select')?.value || '30';
+    };
+  });
+}
+
+// ─── COLOUR WHEEL THEORY ───────────────────────────────────────────────
+// Returns complementary, analogous, and triadic colours for a given HEX
+function hexToHsl(hex) {
+  let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h, s, l=(max+min)/2;
+  if(d===0){ h=s=0; } else {
+    s = l>.5 ? d/(2-max-min) : d/(max+min);
+    switch(max){ case r: h=(g-b)/d+(g<b?6:0); break; case g: h=(b-r)/d+2; break; default: h=(r-g)/d+4; }
+    h /= 6;
+  }
+  return [Math.round(h*360), Math.round(s*100), Math.round(l*100)];
+}
+function hslToHex(h,s,l) {
+  s/=100; l/=100;
+  const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l);
+  const f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+  return '#'+[f(0),f(8),f(4)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('');
+}
+function getColourMatches(hex) {
+  const [h,s,l] = hexToHsl(hex);
+  return {
+    complementary: [hslToHex((h+180)%360, s, l)],
+    analogous:     [hslToHex((h+30)%360,s,l), hslToHex((h-30+360)%360,s,l)],
+    triadic:       [hslToHex((h+120)%360,s,l), hslToHex((h+240)%360,s,l)],
+    split:         [hslToHex((h+150)%360,s,l), hslToHex((h+210)%360,s,l)],
+  };
+}
+function colourDistance(hex1, hex2) {
+  const r1=parseInt(hex1.slice(1,3),16), g1=parseInt(hex1.slice(3,5),16), b1=parseInt(hex1.slice(5,7),16);
+  const r2=parseInt(hex2.slice(1,3),16), g2=parseInt(hex2.slice(3,5),16), b2=parseInt(hex2.slice(5,7),16);
+  return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);
+}
+// Map colour name from hue
+function hueName(hex) {
+  const [h] = hexToHsl(hex);
+  if(h<15||h>=345) return 'Red'; if(h<45) return 'Orange'; if(h<75) return 'Yellow';
+  if(h<150) return 'Green'; if(h<195) return 'Cyan'; if(h<255) return 'Blue';
+  if(h<285) return 'Violet'; if(h<345) return 'Pink'; return 'Red';
+}
+
+// Extract dominant colour from image via canvas pixel sampling
+function extractDominantColour(imgEl) {
+  const c = document.createElement('canvas');
+  c.width = 50; c.height = 50;
+  const ctx = c.getContext('2d');
+  ctx.drawImage(imgEl, 0, 0, 50, 50);
+  const data = ctx.getImageData(0, 0, 50, 50).data;
+  let r=0,g=0,b=0,count=0;
+  for(let i=0;i<data.length;i+=4) {
+    // Skip near-white (background) pixels
+    if(data[i]>240 && data[i+1]>240 && data[i+2]>240) continue;
+    if(data[i+3] < 50) continue; // skip transparent
+    r+=data[i]; g+=data[i+1]; b+=data[i+2]; count++;
+  }
+  if(!count) return '#888888';
+  r=Math.round(r/count); g=Math.round(g/count); b=Math.round(b/count);
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+// ─── WARDROBE ZONE — stubs defer to wardrobe.js module ──────────────
+// wardrobeMode / imageBase64 / dominantColour now live in _wrd inside wardrobe.js
+let wardrobeMode        = 'bottom';
+let wardrobeImageBase64 = null;
+let wardrobeDominantColour = '#888888';
+
+function setWardrobeMode(btn) {
+  // Handled by wardrobe.js — this stub kept for safety
+  document.querySelectorAll('.wrd-tog-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  wardrobeMode = btn.dataset.mode;
+  if (window._wrd) window._wrd.matchType = btn.dataset.mode;
+}
+
+function setupWardrobe() {
+  // Deferred to wardrobe.js — setupWardrobeEnhanced() runs after DOMContentLoaded
+  if (window.setupWardrobeEnhanced) window.setupWardrobeEnhanced();
+}
+
+async function consultWardrobe() {
+  if(!wardrobeImageBase64){ toast('⚠','Please upload a garment first.'); return; }
+  document.getElementById('loading-overlay').classList.add('show');
+  await animateSteps();
+
+  // Colour wheel matching logic
+  const matches = getColourMatches(wardrobeDominantColour);
+  const targetColours = [...matches.complementary, ...matches.analogous]; // best theory picks
+
+  // Load dataset and find products with matching colours
+  await loadDataset();
+  const modeIsBottom = wardrobeMode === 'match_bottom';
+  const wantCats = modeIsBottom
+    ? ['Bottoms','Athleisure']
+    : ['Tops','Shirts','Ethnic Wear','Workwear'];
+
+  const budgetCap = state.profile.budget || 50000;
+  const gender = state.profile.gender || 'female';
+
+  function genderOk(p) {
+    if(p.gender==='any') return true;
+    const gMap={female:'female',feminine:'female',male:'male',masculine:'male'};
+    return p.gender===(gMap[gender?.toLowerCase()]||gender?.toLowerCase());
+  }
+
+  // Score by colour proximity + category match
+  const colScored = ORACLE_PRODUCTS
+    .filter(p => p.price<=budgetCap && genderOk(p))
+    .map(p => {
+      let score = 0;
+      // Category match
+      if(wantCats.some(c => p.category===c)) score += 50;
+      // Colour proximity to target colours
+      const pHex = colourNameToHex(p.colour);
+      if(pHex) {
+        const bestDist = Math.min(...targetColours.map(tc => colourDistance(pHex, tc)));
+        score += Math.max(0, 80 - bestDist * 0.3); // closer = higher score
+      }
+      score += p.rating * 8;
+      score += Math.random() * 10;
+      return { ...p, _score: score };
+    })
+    .sort((a,b) => b._score - a._score)
+    .slice(0, 8);
+
+  document.getElementById('loading-overlay').classList.remove('show');
+
+  // Attempt live n8n call
+  let finalRecs = colScored.length ? colScored.map((p,i) => ({
+    title: p.title.length>60 ? p.title.slice(0,58)+'…' : p.title,
+    category: p.category, occasion: p.occasion,
+    confidence: Math.min(99, Math.round(60 + p._score / 5)),
+    price: p.price_fmt, price_raw: p.price, brand: p.brand,
+    badge: ['Colour Match','Complementary','Analogous','Triadic'][i%4],
+    items: [p.colour + ' ' + p.category],
+    tip: `Pairs with your ${hueName(wardrobeDominantColour)} garment via ${['complementary','analogous','split-complementary'][i%3]} colour theory.`,
+    gradient: CAT_GRADIENTS[p.category]||CAT_GRADIENTS['Fashion'],
+    emoji: p.emoji, price_history: p.sparkline,
+    affiliate_link: `https://www.myntra.com/${p.id}`,
+    img_url: p.img_url||p.img, _pid: p.id, rating: p.rating,
+  })) : MOCK_RECS;
+
+  try {
+    const ctrl = new AbortController(); setTimeout(()=>ctrl.abort(),8000);
+    const payload = {
+      request_type: 'wardrobe_match', mode: wardrobeMode,
+      uploaded_garment: wardrobeImageBase64,
+      dominant_colour: wardrobeDominantColour,
+      colour_matches: matches,
+      user_profile: { gender: state.profile.gender, bodyShape: state.profile.bodyShape, skinTone: state.profile.skinTone },
+      user_sizes: { upper: state.profile.topSize||'M', lower: state.profile.bottomSize||'30' },
+      budget: state.profile.budget || 10000,
+      location: state.profile.location || 'India',
+    };
+    const r = await fetch(N8N_URL, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ctrl.signal});
+    if(r.ok){ const d=await r.json(); if(d?.recommendations?.length) finalRecs=d.recommendations; }
+  } catch(e){ console.warn('Wardrobe API:', e.message); }
+
+  // Show colour wheel display
+  const cwDisplay = document.getElementById('wrd-colour-wheel-display');
+  if(cwDisplay) {
+    const colourLabels = [
+      {hex: wardrobeDominantColour, label: 'Your Garment'},
+      {hex: matches.complementary[0], label: 'Complementary'},
+      {hex: matches.analogous[0], label: 'Analogous'},
+      {hex: matches.triadic[0], label: 'Triadic'},
+    ];
+    cwDisplay.innerHTML = colourLabels.map(cl =>
+      `<div style="text-align:center">
+        <div style="width:36px;height:36px;border-radius:50%;background:${cl.hex};border:2px solid rgba(212,175,55,.5);margin:0 auto .4rem;"></div>
+        <div style="font-size:.7rem;color:var(--slate-light);">${cl.label}</div>
+      </div>`
+    ).join('<div style="color:var(--gold);font-size:1.2rem;align-self:center;">→</div>');
+  }
+  document.getElementById('wrd-results-subtitle').textContent =
+    `${finalRecs.length} items matched to your ${hueName(wardrobeDominantColour)} garment via colour theory`;
+
+  renderWardrobeResults(finalRecs);
+  showScreen('wardrobe-results');
+  setTimeout(()=>{ setupTilt(); setupSparklines(); },200);
+}
+
+// Approximate colour name to hex for dataset matching
+const COLOUR_HEX_MAP = {
+  black:'#111111',white:'#ffffff',red:'#cc2222',blue:'#2255cc',
+  green:'#22aa33',yellow:'#ddcc22',orange:'#ee7722',pink:'#ee55aa',
+  purple:'#7722cc',brown:'#885522',grey:'#888888',gray:'#888888',
+  navy:'#112266',beige:'#d4b896',cream:'#f5f0e0',olive:'#6d7722',
+  maroon:'#880022',teal:'#229988',coral:'#ff6b6b',mustard:'#cc9922',
+  'off-white':'#f0ede0',lavender:'#bb99dd',mint:'#99ddbb',
+  burgundy:'#7a0022',ivory:'#fffff0',khaki:'#c3b091',
+};
+function colourNameToHex(name) {
+  if(!name) return null;
+  const n = name.toLowerCase();
+  for(const [key,hex] of Object.entries(COLOUR_HEX_MAP)) {
+    if(n.includes(key)) return hex;
+  }
+  return null;
+}
+
+function renderWardrobeResults(recs) {
+  const grid = document.getElementById('wrd-rec-grid');
+  if(!grid) return;
+  grid.innerHTML = recs.map((r,i) => {
+    const sparks = r.price_history || genSparklineData();
+    const sparkMin = '₹'+Math.min(...sparks).toLocaleString('en-IN');
+    const sparkMax = '₹'+Math.max(...sparks).toLocaleString('en-IN');
+    const hasImg = r.img_url && r.img_url.startsWith('http');
+    const imgHtml = hasImg ? `<img src="${r.img_url}" alt="${r.title}" style="width:100%;height:100%;object-fit:cover;opacity:.85;" onerror="this.style.display='none'">` : '';
+    const affLink = r.affiliate_link || (r._pid ? `https://www.myntra.com/${r._pid}` : 'https://www.myntra.com/');
+    return `<div class="rec-card" data-i="${i}">
+      <div class="rec-card-glow"></div>
+      <div class="rec-card-header" style="background:${r.gradient||'linear-gradient(135deg,#1a0a2e,#2e1a4e)'};overflow:hidden;position:relative;">
+        ${imgHtml}
+        ${r.badge?`<div class="rec-card-badge" style="position:absolute;top:.75rem;left:.75rem;z-index:2;background:var(--teal,#229988);">${r.badge}</div>`:''}
+        <div class="rec-confidence" style="position:absolute;top:.75rem;right:.75rem;z-index:2;">${r.confidence||88}% match</div>
+        <div class="rec-emoji" style="${hasImg?'display:none;':''}position:absolute;bottom:.75rem;right:.75rem;z-index:2;">${r.emoji||'👗'}</div>
+      </div>
+      <div class="rec-body">
+        <div class="retailer-row">
+          <div class="retailer-badge">🛍 Myntra</div>
+          <div class="retailer-price-bold">${r.price||'₹2,999'}</div>
+        </div>
+        <div class="rec-category">${r.category||'Style'}</div>
+        <div class="rec-title">${r.title}</div>
+        ${r.tip?`<div class="rec-tip">"${r.tip}"</div>`:''}
+        <div class="sparkline-wrap">
+          <div class="sparkline-label">90-day trend &nbsp;·&nbsp; ${sparkMin} – ${sparkMax}</div>
+          <canvas class="sparkline-canvas" data-spark='${JSON.stringify(sparks)}'></canvas>
+        </div>
+        <button class="btn-affiliate" onclick="window.open('${affLink}','_blank')">🛒 Buy Now</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── SIZE AVAILABILITY BADGE ───────────────────────────────────────────
+function getSizeBadge(product) {
+  const topSize = state.profile.topSize;
+  const botSize = state.profile.bottomSize;
+  if(!topSize && !botSize) return '';
+  // Determine which size is relevant
+  const isBotCat = ['Bottoms','Athleisure'].includes(product.category);
+  const size = isBotCat ? (botSize||'30') : (topSize||'M');
+  if(!size) return '';
+  // Hash product ID for mock availability
+  const hash = product._pid ? (Array.from(String(product._pid)).reduce((a,c)=>a+c.charCodeAt(0),0)) : Math.random()*100;
+  const avail = hash % 10;
+  if(avail < 7) return `<div class="size-badge size-green">✓ Size ${size} available</div>`;
+  if(avail < 9) return `<div class="size-badge size-yellow">⚠ Low stock — Size ${size}</div>`;
+  return `<div class="size-badge size-red">✗ Size ${size} may be out</div>`;
+}
+
+// ─── REBUILD CANVAS VTO ────────────────────────────────────────────────
+let vtoState = { x: 0, y: 0, scale: 1, productImg: null };
+
+function openVTO(btn) {
+  const title = btn.dataset.title || 'Oracle Look';
+  const imgUrl = btn.dataset.img || '';
+  const emoji  = btn.dataset.emoji || '👗';
+  document.getElementById('vto-item-label').textContent = `Fitting: ${title.slice(0,45)}`;
+  document.getElementById('vto-modal').classList.add('open');
+  document.getElementById('vto-controls').style.display = 'none';
+  document.getElementById('vto-save-btn').style.display = 'none';
+  const progressWrap = document.getElementById('vto-progress-wrap');
+  progressWrap.style.display = 'block';
+
+  vtoState = { x: 0, y: 60, scale: 1, productImg: null };
+
+  // Animate progress
+  const fill = document.getElementById('vto-fill');
+  const pct  = document.getElementById('vto-pct');
+  let p = 0;
+  const prog = setInterval(() => {
+    p = Math.min(p + Math.random() * 18, 95);
+    fill.style.width = p + '%';
+    pct.textContent = Math.round(p) + '%';
+  }, 200);
+
+  const canvas = document.getElementById('vto-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Draw base: selfie or placeholder
+  function drawBase() {
+    ctx.clearRect(0, 0, W, H);
+    if(state.imageBase64) {
+      const self = new Image();
+      self.onload = () => {
+        ctx.drawImage(self, 0, 0, W, H);
+        drawOverlay();
+      };
+      self.src = 'data:image/jpeg;base64,' + state.imageBase64;
+    } else {
+      // Dark gradient placeholder
+      const grad = ctx.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0,'#0e0e1a'); grad.addColorStop(1,'#1a0e2e');
+      ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+      ctx.font=`${W*0.45}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.globalAlpha=0.25; ctx.fillText('👤',W/2,H/2); ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(212,175,55,0.5)'; ctx.font='12px Inter,sans-serif';
+      ctx.fillText('Upload selfie for full try-on',W/2,H-24);
+      drawOverlay();
+    }
+  }
+
+  function drawOverlay() {
+    if(!vtoState.productImg) return;
+    const img = vtoState.productImg;
+    const iw = img.width * vtoState.scale;
+    const ih = img.height * (iw/img.width);
+    const scaleH = (H * 0.55) / ih;
+    const fw = iw * scaleH, fh = ih * scaleH;
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.globalAlpha = 0.88;
+    ctx.drawImage(img, W/2 - fw/2 + vtoState.x, vtoState.y, fw, fh);
+    ctx.restore();
+    // Gold frame
+    ctx.strokeStyle='rgba(212,175,55,0.4)'; ctx.lineWidth=2;
+    ctx.strokeRect(2,2,W-4,H-4);
+    ctx.fillStyle='rgba(212,175,55,0.8)'; ctx.font='bold 11px Inter,sans-serif';
+    ctx.textAlign='left'; ctx.fillText('◈ Oracle Virtual Mirror', 10, 18);
+  }
+
+  window._vtoDrawBase = drawBase;
+
+  // Load product image via corsproxy
+  if(imgUrl) {
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(imgUrl)}`;
+    const pImg = new Image();
+    pImg.crossOrigin = 'anonymous';
+    pImg.onload = () => {
+      clearInterval(prog);
+      fill.style.width='100%'; pct.textContent='100%';
+      setTimeout(() => {
+        progressWrap.style.display='none';
+        document.getElementById('vto-controls').style.display='block';
+        document.getElementById('vto-save-btn').style.display='inline-flex';
+        vtoState.productImg = pImg;
+        drawBase();
+        toast('◈','Garment layered! Use arrows to adjust fit.');
+      }, 400);
+    };
+    pImg.onerror = () => {
+      // Fallback: draw emoji if image fails
+      clearInterval(prog);
+      progressWrap.style.display='none';
+      drawBase();
+      // Draw emoji as garment
+      ctx.font=`${W*0.5}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.globalAlpha=0.7; ctx.fillText(emoji,W/2,H/2-20); ctx.globalAlpha=1;
+      document.getElementById('vto-save-btn').style.display='inline-flex';
+      toast('◈','Try-on ready (emoji mode — image blocked by CORS)');
+    };
+    pImg.src = proxyUrl;
+  } else {
+    clearInterval(prog);
+    progressWrap.style.display='none';
+    drawBase();
+    document.getElementById('vto-save-btn').style.display='inline-flex';
+  }
+}
+
+function vtoAdjust(dx, dy) {
+  vtoState.x += dx; vtoState.y += dy;
+  if(window._vtoDrawBase) window._vtoDrawBase();
+}
+function vtoScale(ds) {
+  vtoState.scale = Math.max(0.3, Math.min(3, vtoState.scale + ds));
+  if(window._vtoDrawBase) window._vtoDrawBase();
+}
+function closeVTO() { document.getElementById('vto-modal').classList.remove('open'); }
+function saveVTO() {
+  const canvas = document.getElementById('vto-canvas');
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'oracle-look.png'; a.click();
+  toast('✓','Look saved!');
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded',()=>{
+  const ses=JSON.parse(localStorage.getItem('oracle_ses')||'null');
+  if(ses) state.user=ses;
+
+  setupAuth(); setupStep1(); setupStep2(); setupStep4(); setupScan(); setupWardrobe();
+
+  document.getElementById('btn-start').onclick=()=>showScreen('auth');
+  document.getElementById('btn-logout').onclick=()=>{ localStorage.removeItem('oracle_ses'); state.user=null; showScreen('landing'); };
+  document.getElementById('btn-redo').onclick=()=>{
+    state.imageBase64=null;
+    const sp=document.getElementById('scan-preview'); if(sp) sp.style.display='none';
+    const sph=document.getElementById('scan-placeholder'); if(sph) sph.style.display='flex';
+    const sz=document.getElementById('scan-zone'); if(sz) sz.classList.remove('has-image');
+    showScreen('scan');
+  };
+  document.getElementById('btn-restart').onclick=()=>{
+    state.profile={height:'',heightUnit:'cm',location:'',gender:'',bodyShape:'',style:[],budget:10000,skinTone:'',topSize:'M',bottomSize:'30'};
+    state.imageBase64=null; showScreen('step1');
+  };
+
+  // Step3 back still handled by inline onclick
+  setupSkinTone();
+  setupBudget();
+
+  showScreen('landing');
+});
+
+// ── VTO shims — delegate to vto_engine.js once loaded ──
+// vto_engine.js is loaded via window.load event and sets window._vtoEngine_* functions.
+// These stubs ensure onclick="openVTO(this)" works even if engine loads slightly late.
+window.openVTO = function(btn) {
+  if (window._vtoEngine_openVTO) { window._vtoEngine_openVTO(btn); return; }
+  toast('◈', 'Virtual Mirror loading… try again in 2 seconds.');
+  const t = setInterval(() => {
+    if (window._vtoEngine_openVTO) { clearInterval(t); window._vtoEngine_openVTO(btn); }
+  }, 300);
+};
+window.closeVTO  = function() { if (window._vtoEngine_closeVTO)  window._vtoEngine_closeVTO();  else document.getElementById('vto-modal').classList.remove('open'); };
+window.saveVTO   = function() { if (window._vtoEngine_saveVTO)   window._vtoEngine_saveVTO();   };
+window.vtoAdjust = function(dx,dy) { if (window._vtoEngine_vtoAdjust) window._vtoEngine_vtoAdjust(dx,dy); };
+window.vtoScale  = function(ds)    { if (window._vtoEngine_vtoScale)  window._vtoEngine_vtoScale(ds);    };
+window.setWardrobeMode=setWardrobeMode; window.consultWardrobe=consultWardrobe;
+
+</script>
+
+<!-- ── Fashion AI Engine (enriched products + outfit rules) ── -->
+<script src="fashion-ai.js"></script>
+<!-- ── Virtual Mirror Module 2 ── -->
+<script src="virtual-mirror.js"></script>
+<!-- ── My Wardrobe Module (n8n matchGarment) ── -->
+<script src="wardrobe.js"></script>
+</body>
+</html>
+
+
